@@ -77,6 +77,14 @@ export class TodoAccess {
             Bucket: this.bucketName,
             Key: imageId
         })
+
+        logger.info('Signed URL info: ', {
+            'command': command,
+            'bucket': this.bucketName,
+            'imageId': imageId,
+            'expiresIn': this.urlExpiration,
+        })
+
         const url = await getSignedUrl(this.s3ClientXRay, command, {
             expiresIn: this.urlExpiration
         })
@@ -104,8 +112,6 @@ export class TodoAccess {
         const expressionAttributeNames = keys.reduce((result, key) => ({ ...result, [`#${key}`]: key }), {});
         const expressionAttributeValues = keys.reduce((result, key) => ({ ...result, [`:${key}`]: updatedTodo[key] }), {});
 
-        console.log('Please please please log to the console')
-
         logger.info('Update Expression: ', {
             'keys': keys,
             'updateExpression': updateExpression,
@@ -113,34 +119,32 @@ export class TodoAccess {
             'expressionAttributeValues': expressionAttributeValues,
         })
 
-        console.log('WTF, why is this not running?')
-
         // For debugging
-        try {
+        // try {
 
-            console.log('Entered the try block')
+        //     console.log('Entered the try block')
 
-            const itemToUpdate = await this.dynamoDbClient.get({
-                TableName: this.todosTable,
-                Key: {
-                    todoId: todoId,
-                    userId: userId
-                }
-            })
+        //     const itemToUpdate = await this.dynamoDbClient.get({
+        //         TableName: this.todosTable,
+        //         Key: {
+        //             todoId: todoId,
+        //             userId: userId
+        //         }
+        //     })
 
-            console.log('Make it past the get call')
+        //     console.log('Make it past the get call')
 
-            logger.info('Item to Update: ', {
-                'itemToUpdate': itemToUpdate,
-            })
-        }
-        catch (error) {
-            console.log('Entered the catch')
+        //     logger.info('Item to Update: ', {
+        //         'itemToUpdate': itemToUpdate,
+        //     })
+        // }
+        // catch (error) {
+        //     console.log('Entered the catch')
 
-            logger.info('Error while fetching item: ', {
-                'error message': error.message
-            })
-        }
+        //     logger.info('Error while fetching item: ', {
+        //         'error message': error.message
+        //     })
+        // }
 
         const updated_result = await this.dynamoDbClient.update({
             TableName: this.todosTable,
