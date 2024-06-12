@@ -17,6 +17,7 @@ export async function getTodos(idToken) {
 }
 
 export async function createTodo(idToken, newTodo) {
+  console.log('Entered createTodo')
   const response = await Axios.post(
     `${process.env.REACT_APP_API_ENDPOINT}/todos`,
     JSON.stringify(newTodo),
@@ -27,6 +28,7 @@ export async function createTodo(idToken, newTodo) {
       }
     }
   )
+  console.log('Made it past post request')
   return response.data.item
 }
 
