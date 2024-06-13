@@ -20,7 +20,7 @@ export async function handler(event) {
     headers: {
       'Access-Control-Allow-Origin': '*'
     },
-    body: url
+    body: JSON.stringify(url)
   }
 }
 
