@@ -20,7 +20,7 @@ export async function handler(event) {
       'Access-Control-Allow-Origin': '*'
     },
     body: JSON.stringify({
-      uploadTodo
+      item: uploadTodo
     })
   }
 }

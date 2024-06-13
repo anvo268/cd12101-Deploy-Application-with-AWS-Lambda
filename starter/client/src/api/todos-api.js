@@ -29,6 +29,7 @@ export async function createTodo(idToken, newTodo) {
     }
   )
   console.log('Made it past post request')
+  console.log('response: ', response)
   return response.data.item
 }
 

@@ -20,7 +20,7 @@ export async function handler(event) {
     headers: {
       'Access-Control-Allow-Origin': '*'
     },
-    body: JSON.stringify(url)
+    body: JSON.stringify({uploadUrl: url})
   }
 }
 

@@ -20,7 +20,10 @@ export function NewTodoInput({ onNewTodo }) {
         name: newTodoName,
         dueDate
       })
+      console.log('createTodo() ran successfully for: ', newTodoName)
+      console.log('createTodo value: ', createdTodo)
       onNewTodo(createdTodo)
+      console.log('onNewTodo() ran successfully for: ', newTodoName)
     } catch (e) {
       console.log('Failed to created a new TODO', e)
       alert('Todo creation failed')
