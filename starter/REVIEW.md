@@ -27,10 +27,10 @@ to login w/ Google or whatever)
 
 ## Yes Review
 
-* backend/serverless.yml - Define the serverless app configuration details
+* [backend/serverless.yml](https://github.com/anvo268/cd12101-Deploy-Application-with-AWS-Lambda/blob/review_branch/starter/backend/serverless.yml) - Define the serverless app configuration details
     * Run `serverless deploy --stage dev --region us-east-1` to build all your serverless resources
 
-* backend/src/lambda/http/getTodos.js - GetTodos lambda function handler
+* [backend/src/lambda/http/getTodos.js](https://github.com/anvo268/cd12101-Deploy-Application-with-AWS-Lambda/blob/review_branch/starter/backend/src/lambda/http/getTodos.js) - GetTodos lambda function handler
     * Note that this is what returns the HTTP status code, headers, etc. The structure of this stuff is what makes
     it conform to the HTTP protocol (and I guess sort of REST APIs too)
     * Notice that the business logic (`getTodos()`) lives in another file. Separating the business logic from the 
@@ -43,8 +43,8 @@ to login w/ Google or whatever)
         (see lambda/ dir). This makes the business logic agnostic to the technologies used so we don't have vendor
         lock in
 
-* backend/src/dataLayer/todosAccess.mjs - Data layer implementation
-* backend/src/businessLogic/todos.mjs - Business logic implementation
+* [backend/src/dataLayer/todosAccess.mjs](https://github.com/anvo268/cd12101-Deploy-Application-with-AWS-Lambda/blob/review_branch/starter/backend/src/dataLayer/todosAccess.mjs) - Data layer implementation
+* [backend/src/businessLogic/todos.mjs](https://github.com/anvo268/cd12101-Deploy-Application-with-AWS-Lambda/blob/review_branch/starter/backend/src/businessLogic/todos.mjs) - Business logic implementation
 
 *Note the directory structure*
 ![alt text](<review_images/CleanShot 2024-07-05 at 14.49.31@2x.png>)
