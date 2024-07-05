@@ -1,26 +1,36 @@
-service: serverless-todo-app-v2
+service: serverless-todo-app-v2 # Names the service/project
 
-plugins:
-  - serverless-iam-roles-per-function
+# Where you could add plugins. You don't need the iam plugin because it's now built in
+# (Actually, I'm slightly fuzzy on whether this is true)
+# plugins:
+#   - serverless-iam-roles-per-function
 
 frameworkVersion: '3'
 
+# "provider" - Context about the cloud provider. In this case AWS
 provider:
   name: aws
-  runtime: nodejs20.x
-  tracing:
+  # runtime: nodejs20.x
+  runtime: nodejs16.x # Tells AWS Lambda to use the Node.js runtime. Could be like Python3.9 or java11, etc
+  tracing: # Enables AWS X-Ray Tracing for AWS Lambda and API Gateway
     lambda: true
     apiGateway: true
 
-  stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-1'}
+  # ${opt:...} is used to reference arguments passed in via the command line. Second argument is the default value
+  stage: ${opt:stage, 'dev'} # Could be dev, staging, prod, etc
+  region: ${opt:region, 'us-east-1'} # AWS resource region
 
+  # Defines your "environment variables". These can be referenced by lambda functions or elsewhere in this serverless.yml
+  # file 
   environment:
-    TODOS_TABLE: Todos-${self:provider.stage}
+    TODOS_TABLE: Todos-dup-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    IMAGES_S3_BUCKET: todos-images-bucket-${self:provider.stage}
-    SIGNED_URL_EXPIRATION: 30000
+    IMAGES_S3_BUCKET: todos-images-bucket-dup-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
 
+  # Defines IAM role statements for all your lambda functions. It allows the functions to send trace segments and 
+  # telemetry records to AWS X-Ray for tracing purposes. The Resource: "*" line specifies that these permissions 
+  # apply to all resources.
   iam:
     role:
       statements:
@@ -31,27 +41,43 @@ provider:
           Resource:
             - "*"
 
+# Defines the functions available to AWS Lambda. "handler" specifies where the actual implementation is defined.
+# Eg src/lambda/http/getTodos.handler means the GetTodos() function calls handler() in getTodos.py
 functions:
 
+  # Defines the custom "authorizer". Notice that this function gets referenced under "authorizer: Auth" for each 
+  # function defined below
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  # TODO: Configure this function (test change)
-  GetTodos:
-    handler: src/lambda/http/getTodos.handler
+  GetTodos: # GetTodos is the Lambda function 
+
+    handler: src/lambda/http/getTodos.handler # Path the the handler funtion actually called
+
+    # Grants the dynamodb:Query action on the TODOS_TABLE. This allows the function to query the DynamoDB table.
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-    events:
-      - http:
-          method: get
-          authorizer: Auth
-          path: todos
-          cors: true
 
-  # TODO: Configure this function
+    events:
+
+      - http:
+
+          # Specifies the HTTP method that will trigger the associated Lambda function. In this case, it indicates that 
+          # an HTTP GET request to the specified path will invoke the Lambda function.
+          method: get
+
+          authorizer: Auth # Auth function is used as the custom authorizer for GET requests to the /todos endpoint
+
+          path: todos # Specifies the endpoint path that will trigger the associated lambda function
+
+          # Enables Cross-Origin Resource Sharing (CORS) for the specified endpoint.  CORS is a security feature 
+          # implemented by web browsers to control how resources on a web page can be requested from another domain
+          # outside the domain from which the resource originated.
+          cors: true 
+
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
     iamRoleStatements:
@@ -65,11 +91,12 @@ functions:
           authorizer: Auth
           path: todos
           cors: true
+
+          # "Validates" the incoming request for ensuring that the incoming request JSON matches the specified schema
           request:
             schemas:
               application/json: ${file(models/create-todo-request.json)}
 
-#   # TODO: Configure this function
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
     iamRoleStatements:
@@ -87,7 +114,6 @@ functions:
             schemas:
               application/json: ${file(models/update-todo-request.json)}
 
-#   # TODO: Configure this function
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
     iamRoleStatements:
@@ -102,7 +128,6 @@ functions:
           path: todos/{todoId}
           cors: true
 
-#   # TODO: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     iamRoleStatements:
@@ -122,9 +147,9 @@ functions:
           path: todos/{todoId}/attachment
           cors: true
 
+# Defines (and inexplicably creates) the additional resources the serverless application resources
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
     TodosTable:
       Type: AWS::DynamoDB::Table
       Properties:
